@@ -1,0 +1,7 @@
+.venv
+.env
+extracted_unique_images
+pdf.pdf
+raw_kindle_text.txt
+structured_annotations.json
+transcribed_annotations.json

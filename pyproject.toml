@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zettel"
+version = "1.0.0"
+authors = [
+  { name="Blaine Freestone", email="blainefreestone01@gmail.com" },
+]
+description = "A CLI tool to process reading annotations from Kindle into a Zettelkasten."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "python-dotenv",
+    "openai",
+    "PyMuPDF",
+    "Jinja2",
+]
+
+[project.scripts]
+zettel = "zettel.cli:main"

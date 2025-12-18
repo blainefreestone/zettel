@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 from typing import Dict, Any
 
 from jinja2 import Environment, FileSystemLoader
@@ -48,7 +49,8 @@ class NoteGenerator:
             self,
             organized_data: Dict[str, Any],
             transcribed_data: Dict[str, Any],
-            output_dir: str
+            output_dir: str,
+            document_title: str
         ):
             """
             Generates individual markdown files for each permanent idea (Zettel).
@@ -91,10 +93,15 @@ class NoteGenerator:
                         continue
 
                     linked_locations = [link['ref_location'] for link in idea.get('links', [])]
+                    
+                    # Get current date in YYYY-MM-DD format
+                    current_date = datetime.now().strftime('%Y-%m-%d')
 
                     markdown_output = template.render(
                         content=idea_content,
-                        locations=linked_locations
+                        locations=linked_locations,
+                        date_created=current_date,
+                        source_title=document_title
                     )
 
                     filename = f"idea_{i + 1:03d}.md"

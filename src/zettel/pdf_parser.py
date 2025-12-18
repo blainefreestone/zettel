@@ -18,6 +18,20 @@ class PDFParser:
         self._pdf_path = pdf_path
         self._image_dir = image_dir
         self._doc = fitz.open(self._pdf_path)
+    
+    def get_title(self) -> str:
+        """
+        Extracts the document title from PDF metadata.
+        Falls back to filename without extension if no title is found.
+        """
+        metadata = self._doc.metadata
+        title = metadata.get('title', '') if metadata else ''
+        
+        if not title or title.strip() == '':
+            # Fall back to filename without extension
+            title = os.path.splitext(os.path.basename(self._pdf_path))[0]
+        
+        return title.strip()
 
     def parse(self) -> Dict[str, Any]:
         """
@@ -157,5 +171,5 @@ class PDFParser:
 
     def __del__(self):
         """Ensures the PDF document is closed when the object is destroyed."""
-        if self._doc:
+        if hasattr(self, '_doc') and self._doc:
             self._doc.close()

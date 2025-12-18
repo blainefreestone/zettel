@@ -12,11 +12,12 @@ class ZettelkastenProcessor:
     """
     Orchestrates the entire Zettelkasten workflow from PDF to markdown notes.
     """
-    def __init__(self, pdf_path: str):
+    def __init__(self, pdf_path: str, document_title: str = None):
         self._pdf_path = pdf_path
         self._parser = PDFParser(pdf_path, config.PDF_IMAGE_DIR)
         self._ai_service = AIService()
         self._note_generator = NoteGenerator(config.TEMPLATE_DIR)
+        self._document_title = document_title if document_title else self._parser.get_title()
         os.makedirs(config.OUTPUT_DIR, exist_ok=True)
 
     def run_full_process(self):
@@ -25,7 +26,7 @@ class ZettelkastenProcessor:
         structured_data = self.run_parser()
         transcribed_data = self.run_transcriber(structured_data)
         organized_data = self.run_organizer(transcribed_data)
-        self.run_note_generator(organized_data, transcribed_data)
+        self.run_note_generator(organized_data, transcribed_data, self._document_title)
         logging.info("✅ Full process completed successfully!")
 
     def run_parser(self) -> Dict[str, Any]:
@@ -52,18 +53,20 @@ class ZettelkastenProcessor:
         self._save_json(organized_data, config.ORGANIZED_JSON_PATH)
         return organized_data
         
-    def run_note_generator(self, organized_data: Dict[str, Any] = None, transcribed_data: Dict[str, Any] = None):
+    def run_note_generator(self, organized_data: Dict[str, Any] = None, transcribed_data: Dict[str, Any] = None, document_title: str = None):
         """Runs only the final note generation stage."""
         if organized_data is None:
             organized_data = self._load_json(config.ORGANIZED_JSON_PATH)
         if transcribed_data is None:
             transcribed_data = self._load_json(config.TRANSCRIBED_JSON_PATH)
+        if document_title is None:
+            document_title = self._document_title
 
         self._note_generator.create_literature_note(
             transcribed_data, config.LITERATURE_NOTE_PATH
         )
         self._note_generator.create_permanent_notes(
-            organized_data, transcribed_data, config.PERMANENT_NOTE_DIR
+            organized_data, transcribed_data, config.PERMANENT_NOTE_DIR, document_title
         )
 
     def _save_json(self, data: Dict, path: str):

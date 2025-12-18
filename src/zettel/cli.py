@@ -21,6 +21,11 @@ def main():
         description="A CLI tool to process reading annotations into a Zettelkasten."
     )
     parser.add_argument("pdf_path", help="Path to the input PDF file with Kindle annotations.")
+    parser.add_argument(
+        "--title",
+        required=True,
+        help="Title of the source document (for references in generated notes)."
+    )
     
     # Add arguments for running specific steps
     parser.add_argument(
@@ -33,7 +38,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        processor = ZettelkastenProcessor(args.pdf_path)
+        processor = ZettelkastenProcessor(args.pdf_path, document_title=args.title)
 
         if args.step == 'all':
             processor.run_full_process()

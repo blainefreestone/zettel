@@ -85,7 +85,17 @@ class AIService:
                 }
             )
             
-            response_text = response.output[0].content[0].text
+            # Find the first output item with actual content (skip reasoning items)
+            content_item = None
+            for item in response.output:
+                if hasattr(item, 'content') and item.content and len(item.content) > 0:
+                    content_item = item
+                    break
+            
+            if not content_item:
+                raise exceptions.ZettelkastenError("No content found in API response.")
+            
+            response_text = content_item.content[0].text
             organized_data = json.loads(response_text)
             logging.info("Successfully organized ideas.")
             return organized_data

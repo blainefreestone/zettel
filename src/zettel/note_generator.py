@@ -74,12 +74,16 @@ class NoteGenerator:
                         # First, get the item (which could be a note or a highlight)
                         item = transcribed_data[idea_loc][idea_idx]
 
-                        idea_content = item['transcription']['items'][0]['transcription']
-
+                        # Check if it's a note with transcription or just a highlight
+                        if item.get('type') == 'note' and 'transcription' in item:
+                            idea_content = item['transcription'].get('transcription')
+                        elif item.get('type') == 'highlight':
+                            idea_content = item.get('content')
+                        
                         if idea_content:
                             notes_generated_count += 1
                         else:
-                            logging.warning(f"Found item at Loc {idea_loc}, index {idea_idx}, but it has an unknown type or no content. Skipping.")
+                            logging.warning(f"Found item at Loc {idea_loc}, index {idea_idx}, but it has no content. Skipping.")
                             continue
 
                     except (KeyError, IndexError, TypeError):

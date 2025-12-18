@@ -108,7 +108,8 @@ class PDFParser:
                 i += 1
                 continue
 
-            loc_match = re.match(r'Loc (\d+)', line)
+            # Match either "Loc #" or "Page #" format
+            loc_match = re.match(r'(?:Loc|Page) (\d+)', line)
             if loc_match:
                 current_loc = loc_match.group(1)
                 last_loc = current_loc
@@ -118,7 +119,8 @@ class PDFParser:
                 content_lines = []
                 note_found = False
                 i += 1
-                while i < len(lines) and not re.match(r'Loc \d+', lines[i].strip()):
+                # Continue until we hit another location/page marker
+                while i < len(lines) and not re.match(r'(?:Loc|Page) \d+', lines[i].strip()):
                     stripped_line = lines[i].strip()
                     if stripped_line == "Note:":
                         note_found = True
